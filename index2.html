@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<title>나의 교사 유형 테스트</title>
+<style>
+html {
+  font-size: 18px;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  font-family: 'Nanum Gothic', sans-serif;
+  margin:0; padding:0;
+  background: linear-gradient(120deg, #ffe6f0, #fff9e6);
+  color: #333;
+  transition: background 0.4s, color 0.4s;
+  overflow-x: hidden;
+  min-height: 100vh;
+  touch-action: manipulation;
+}
+
+#intro {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+#intro h1 {
+  font-size: 3.8rem;
+  color: #ff6fa1;
+  margin-bottom: 38px;
+  animation: fadeIn 0.8s forwards;
+  user-select: none;
+  font-weight: 900;
+  line-height: 1.13;
+  letter-spacing: -1px;
+}
+#startBtn {
+  padding: 18px 36px;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: 28px;
+  background: #ff6fa1;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 16px rgba(255,111,161,0.18);
+  touch-action: manipulation;
+  user-select: none;
+}
+#startBtn:active { filter: brightness(0.96);}
+#startBtn:hover { background: #ff85b6; transform: scale(1.05); }
+
+#quiz-container {
+  display: none;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+.question {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  text-align: center;
+  animation: fadeIn 0.6s forwards;
+  user-select: none;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.options button {
+  width: 98vw;
+  max-width: 420px;
+  min-height: 56px;
+  padding: 16px;
+  border: none;
+  border-radius: 25px;
+  background: #fff0f5;
+  font-size: 1.07rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255,111,161,0.09);
+  word-break: keep-all;
+  touch-action: manipulation;
+  user-select: none;
+  color: #000 !important;
+}
+.options button:active { filter: brightness(0.94);}
+.options button:hover {
+  background: #ffe6f0;
+  transform: scale(1.03);
+}
+
+#result {
+  display: none;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 20px;
+  background: #fffbe6;
+  text-align: center;
+  animation: fadeIn 0.6s forwards;
+}
+#result h2 { color: #ff6fa1; margin-bottom: 15px; font-size: 1.5em; }
+#homeBtn {
+  padding: 14px 30px;
+  font-size: 1.06em;
+  border: none;
+  border-radius: 25px;
+  background: #ff6fa1;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  touch-action: manipulation;
+  user-select: none;
+}
+#homeBtn:active { filter: brightness(0.96);}
+#homeBtn:hover { background: #ff85b6; transform: scale(1.04); }
+
+@media (max-width:600px){
+  html { font-size: 17.5px; }
+  #intro { padding: 7vw 2vw; }
+  #intro h1 { font-size:2.7rem; margin-bottom: 26px;}
+  #startBtn { font-size:1.13rem; padding: 14px 14vw; }
+  .question { font-size:1.12rem; margin-bottom:13px;}
+  .options button { font-size:1.05rem; min-height: 44px; padding:12px; width:96vw;}
+  #result { padding: 6vw 2vw; }
+  #homeBtn { font-size:1rem; padding:12px 12vw;}
+}
+@media (max-width:400px){
+  html { font-size: 15px; }
+  #intro h1 { font-size:1.6rem;}
+  .question { font-size:0.97rem;}
+}
+@media (max-width:340px){
+  html { font-size: 13.5px; }
+}
+
+@media (prefers-color-scheme: dark){
+  body { background: linear-gradient(120deg, #2b2b2b, #1a1a1a); color: #eee; }
+  #intro h1 { color:#ff8fc1; }
+  #startBtn, #homeBtn { background:#ff8fc1; }
+  .options button { background:#333; color:#fff !important; }
+  .options button:hover { background:#444; }
+  #result { background:#2c2c2c; }
+  .question { color: #fff !important; }
+}
+
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <h1>💖 나의 교사 유형 테스트 💛</h1>
+  <button id="startBtn">테스트 시작 💫</button>
+</div>
+
+<div id="quiz-container">
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+</div>
+
+<div id="result">
+  <h2 id="resultTitle"></h2>
+  <p id="resultDesc" style="white-space: pre-line;"></p>
+  <button id="homeBtn">🏠 홈으로 돌아가기</button>
+</div>
+
+<script>
+const questions = [
+  { q:"어린이집 실습 첫날 교실에 들어가자마자 나는?", options:["아이들 이름 다 외우려는 인간 암기왕","선생님 옆에서 노트에 메모만 작성하는 관찰러","애들이랑 같이 블록 쌓다가 시간 다 감","긴장해서 손에 땀 범벅…"] },
+  { q:"유아가 갑자기 울음을 터뜨렸다! 그럴 때 나는?", options:["바로 옆으로 달려가 안심시킨다","상황을 머릿속으로 정리하며 분석","잠시 멘붕 오지만 다른 교사 도움 요청","함께 공감하며 감정 표현"] },
+  { q:"아이들과 놀이 시간을 보낸 뒤 나는?", options:["아이들 반응 기록하며 반성","오늘 애들 너무 귀여웠어 자랑","체력이 방전돼 잠깐 멍","다음엔 아이디어 메모"] },
+  { q:"내가 꿈꾸는 교사는?", options:["따뜻하게 아이 마음 읽는 교사","체계적으로 수업 기록하는 꼼꼼한 교사","놀이 속에서 웃는 친구 같은 교사","새로운 시도 두려워하지 않는 창의적 교사"] },
+  { q:"교생 실습 중 지도교사에게 피드백 받았다면?", options:["고개 끄덕이며 바로 수정","왜 말씀하셨을까 분석","잠깐 기분 다운 후 회복","다음 수업에 바로 반영 실험"] }
+];
+
+const results = {
+  A:{
+    title:"A 유형 – 따뜻한 공감형 교사(아이의 마음이 먼저 보여요.)",
+    desc:`특징: 누구보다 아이의 감정에 공감하고, 아이가 웃을 때 같이 웃는 타입. 어려운 상황에서도 따뜻한 말 한마디로 분위기를 풀어가는 능력자!
+장점: 따뜻한 눈빛과 배려로 아이들에게 ‘정서적 안정감’을 주는 교사
+주의점: 남의 감정에 너무 몰입해서 가끔 자기 감정이 지쳐버릴 때가 있음
+나의 어울리는 교실 분위기: 포근하고 정겨운, 웃음소리 가득한 반`
+  },
+  B:{
+    title:"B 유형 – 꼼꼼한 계획형 교사(체계가 있어야 아이들이 더 자라요.)",
+    desc:`특징: 수업 전에 플래시카드부터 안전지도까지 완벽하게 준비! 교육과정을 분석하고 메모하며 계획 세우는 게 제일 안정되는 스타일.
+장점: 교사로서 신뢰감이 크고, 평가·기록·계획에서 탁월함
+주의점: 계획이 어긋나면 스트레스 받거나 융통성이 조금 부족할 수 있음
+나의 어울리는 교실 분위기: 정돈되고 깔끔한, 체계적인 환경`
+  },
+  C:{
+    title:"C 유형 – 감성적인 자유형 교사(아이들과 함께 웃고 뛰는 게 나의 행복이에요.)",
+    desc:`특징: 즉흥적이지만 진심으로 아이들과 ‘순간’을 즐기는 타입! 실습 중에도 “이건 놀이야!” 하며 몰입하다가 교사도 함께 놀아버림
+장점: 아이들이 편안하게 다가오는 친근한 에너지
+주의점: 가끔 준비 부족이나 시간 관리가 아쉬울 때도 있음
+나의 어울리는 교실 분위기: 자유롭고 따뜻한, 놀이 중심의 공간`
+  },
+  D:{
+    title:"D 유형 – 창의적 혁신형 교사(새로운 방법 없을까? 그럼 내가 만들어볼게!)",
+    desc:`특징: AI, 새로운 교수법, 트렌드에 관심 많고 실험정신이 강한 타입. “이건 애들 흥미 자극에 좋겠다!” 하며 바로 시도하는 추진력 만렙 교사.
+장점: 유연하고 창의적인 교육 접근으로 아이들의 호기심 자극
+주의점: 디테일보단 전체 흐름에 집중하다가 빠진 부분이 생길 수 있음
+나의 어울리는 교실 분위기: 개성 있고 활발한, 도전적인 반`
+  }
+};
+
+let currentQuestion = 0;
+let score={A:0,B:0,C:0,D:0};
+
+const intro=document.getElementById('intro');
+const startBtn=document.getElementById('startBtn');
+const quizContainer=document.getElementById('quiz-container');
+const questionEl=document.getElementById('question');
+const optionsEl=document.getElementById('options');
+const resultEl=document.getElementById('result');
+const resultTitle=document.getElementById('resultTitle');
+const resultDesc=document.getElementById('resultDesc');
+const homeBtn=document.getElementById('homeBtn');
+
+function showQuestion(){
+  const q=questions[currentQuestion];
+  questionEl.textContent=q.q;
+  optionsEl.innerHTML='';
+  q.options.forEach((opt,idx)=>{
+    const btn=document.createElement('button');
+    btn.textContent=opt;
+    btn.addEventListener('click',()=>selectAnswer(idx), {passive:true});
+    btn.addEventListener('touchstart', e=>{e.preventDefault(); selectAnswer(idx);}, {passive:false});
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx){
+  if(idx===0) score.A++;
+  else if(idx===1) score.B++;
+  else if(idx===2) score.C++;
+  else if(idx===3) score.D++;
+  currentQuestion++;
+  if(currentQuestion<questions.length) showQuestion();
+  else showResult();
+}
+
+function showResult(){
+  quizContainer.style.display='none';
+  resultEl.style.display='block';
+  let maxType='A', maxScore=score.A;
+  ['B','C','D'].forEach(type=>{ if(score[type]>maxScore){ maxType=type; maxScore=score[type]; }});
+  resultTitle.textContent=results[maxType].title;
+  resultDesc.textContent=results[maxType].desc;
+}
+
+function startQuiz(){
+  intro.style.display='none';
+  quizContainer.style.display='block';
+  showQuestion();
+}
+
+startBtn.addEventListener('touchstart', e=>{e.preventDefault(); startQuiz();}, {passive:false});
+startBtn.addEventListener('click', startQuiz);
+
+homeBtn.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  currentQuestion=0;
+  score={A:0,B:0,C:0,D:0};
+  resultEl.style.display='none';
+  intro.style.display='flex';
+}, {passive:false});
+homeBtn.addEventListener('click', ()=>{
+  currentQuestion=0;
+  score={A:0,B:0,C:0,D:0};
+  resultEl.style.display='none';
+  intro.style.display='flex';
+});
+</script>
+</body>
+</html>
